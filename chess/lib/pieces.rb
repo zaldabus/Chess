@@ -1,10 +1,10 @@
 require 'debugger'
 
 class Piece
-  attr_reader :color
+  attr_reader :color, :location
 
-  def initialize(board, loc, color)
-    @board, @location, @color = board, loc, color
+  def initialize(board, location, color)
+    @board, @location, @color = board, location, color
   end
 
   def out_of_bounds?(pos)
@@ -23,7 +23,7 @@ class Piece
       x_dir, y_dir = position[0], position[1]
       position = [@location[0] + x_dir, @location[1] + y_dir]
 
-      sliding_moves(position) if self.is_a?(SlidingPiece)
+      sliding_moves(position, x_dir, y_dir) if self.is_a?(SlidingPiece)
       stepping_moves(position) if self.is_a?(SteppingPiece)
 
     end
@@ -31,7 +31,7 @@ class Piece
     @all_possible_moves
   end
 
-  def sliding_moves(position)
+  def sliding_moves(position, x_dir, y_dir)
     until out_of_bounds?(position)
 
       unless @board[position].nil?
@@ -127,17 +127,17 @@ class Pawn < Piece
 
   MOVES = {
     white: [
-      [ 0, 1],
-      [ 0, 2],
       [-1, 1],
-      [ 1, 1]
+      [ 1, 1],
+      [ 0, 1],
+      [ 0, 2]
     ],
 
     black: [
-      [ 0, -1],
-      [ 0, -2],
       [-1, -1],
-      [ 1, -1]
+      [ 1, -1],
+      [ 0, -1],
+      [ 0, -2]
     ]
    }
 
@@ -155,19 +155,25 @@ class Pawn < Piece
   end
 
   def moves()
+    #skips over piece if still hasn't moved
+    #diagonals need work
     all_moves = []
     # debugger
     MOVES[@color].each do |move|
       x_dir, y_dir = move[0], move[1]
       position = [@location[0] + x_dir, @location[1] + y_dir]
+
       next if y_dir.abs == 2 && moved?
       next if out_of_bounds?(position)
+      break if !@board[position].nil? && x_dir == 0
 
       if x_dir.abs == 1 && !@board[position].nil?
         all_moves << position.dup if @board[position].color != @color
       elsif x_dir.abs == 0 && @board[position].nil?
         all_moves << position.dup
       end
+
+
     end
 
     all_moves

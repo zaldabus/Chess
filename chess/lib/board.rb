@@ -1,4 +1,5 @@
 require_relative 'pieces'
+require 'debugger'
 
 class Board
 
@@ -46,6 +47,25 @@ class Board
   def make_pawn_row(row, color)
      (0..7).each {|i| self[[i, row]] = Pawn.new(self, [i, row], color)}
   end
+
+  def in_check?(color)
+    location = @board
+      .flatten
+      .select { |piece| piece.class == King && piece.color == color }
+      .last
+      .location
+
+    @board.flatten.each do |piece|
+      next if piece.nil?
+      return true if piece.moves.include?(location)
+    end
+    false
+  end
+
+
+
+
+
 
   def render
     @board.each {|row| p row}
