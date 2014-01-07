@@ -1,6 +1,7 @@
 require 'debugger'
 
 class Piece
+  attr_reader :color
 
   def initialize(board, loc, color)
     @board, @location, @color = board, loc, color
@@ -9,6 +10,10 @@ class Piece
   def out_of_bounds?(pos)
     x, y = pos[0], pos[1]
     x < 0 || y < 0 || x >= 8 || y >= 8
+  end
+
+  def to_s
+    self.class
   end
 
   def moves(move_deltas)
@@ -41,6 +46,7 @@ class Piece
   end
 
   def stepping_moves(position)
+    return if out_of_bounds?(position)
     if @board[position].nil?
       @all_possible_moves << position.dup
     else
@@ -135,30 +141,31 @@ class Pawn < Piece
     ]
    }
 
-  def initialize
-    super(loc, color)
+  def initialize(board, loc, color)
+    super(board, loc, color)
     @moved = false
   end
 
   def moved
-    self.moved = true
+    @moved = true
   end
 
   def moved?
     @moved
   end
 
-  def moves(board, type_of_move)
+  def moves()
     all_moves = []
-
-    MOVES[type_of_move].each do |move|
+    # debugger
+    MOVES[@color].each do |move|
       x_dir, y_dir = move[0], move[1]
       position = [@location[0] + x_dir, @location[1] + y_dir]
-      next if y_dir.abs == 2 && moved
+      next if y_dir.abs == 2 && moved?
+      next if out_of_bounds?(position)
 
-      if x_dir.abs == 1 && !board[position].nil?
-        all_moves << position.dup if board[position].color != @color
-      elsif board[position].nil?
+      if x_dir.abs == 1 && !@board[position].nil?
+        all_moves << position.dup if @board[position].color != @color
+      elsif x_dir.abs == 0 && @board[position].nil?
         all_moves << position.dup
       end
     end

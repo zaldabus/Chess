@@ -1,4 +1,4 @@
-require 'pieces'
+require_relative 'pieces'
 
 class Board
 
@@ -22,21 +22,33 @@ class Board
     (0..7).each do |i|
       case i
       when 0, 7
-        @board[[i, row]] = Rook.new(self, [i, row], color)
+        self[[i, row]] = Rook.new(self, [i, row], color)
       when 1, 6
-        @board[[i, row]] = Knight.new(self, [i, row], color)
+        self[[i, row]] = Knight.new(self, [i, row], color)
       when 2, 5
-        @board[[i, row]] = Bishop.new(self, [i, row], color)
+        self[[i, row]] = Bishop.new(self, [i, row], color)
       when 3
-        @board[[i, row]] = Queen.new(self, [i, row], color)
+        if color == :white
+          self[[i, row]] = Queen.new(self, [i, row], color)
+        else
+          self[[i, row]] = King.new(self, [i, row], color)
+        end
       when 4
-        @board[[i, row]] = King.new(self, [i, row], color)
+        if color == :white
+          self[[i, row]] = King.new(self, [i, row], color)
+        else
+          self[[i, row]] = Queen.new(self, [i, row], color)
+        end
       end
     end
   end
 
   def make_pawn_row(row, color)
-     (0..7).each do |i| {|i| @board[[i, row]] = Pawn.new(self, [i, row], color)}
+     (0..7).each {|i| self[[i, row]] = Pawn.new(self, [i, row], color)}
+  end
+
+  def render
+    @board.each {|row| p row}
   end
 
   def [](pos)
