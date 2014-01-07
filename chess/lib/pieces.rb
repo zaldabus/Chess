@@ -2,8 +2,8 @@ require 'debugger'
 
 class Piece
 
-  def initialize(loc, color)
-    @location, @color = loc, color
+  def initialize(board, loc, color)
+    @board, @location, @color = board, loc, color
   end
 
   def out_of_bounds?(pos)
@@ -11,8 +11,41 @@ class Piece
     x < 0 || y < 0 || x >= 8 || y >= 8
   end
 
-  def moves(array)
-    moves_dirs
+  def moves(move_deltas)
+    @all_possible_moves = []
+
+    move_deltas.each do |position|
+      x_dir, y_dir = position[0], position[1]
+      position = [@location[0] + x_dir, @location[1] + y_dir]
+
+      sliding_moves(position) if self.is_a?(SlidingPiece)
+      stepping_moves(position) if self.is_a?(SteppingPiece)
+
+    end
+
+    @all_possible_moves
+  end
+
+  def sliding_moves(position)
+    until out_of_bounds?(position)
+
+      unless @board[position].nil?
+        @all_possible_moves << position.dup if @board[position].color != @color
+        break
+      else
+        @all_possible_moves << position.dup
+        position[0] += x_dir
+        position[1] += y_dir
+      end
+    end
+  end
+
+  def stepping_moves(position)
+    if @board[position].nil?
+      @all_possible_moves << position.dup
+    else
+      @all_possible_moves << position.dup if @board[position].color != @color
+    end
   end
 
 end
@@ -45,28 +78,9 @@ class SlidingPiece < Piece
     ]
   }
 
-  def move_dirs(board, type_of_move)
-    all_possible_moves = []
-
-    MOVES[type_of_move].each do |position|
-      x_dir, y_dir = position[0], position[1]
-      position = [@location[0] + x_dir, @location[1] + y_dir]
-      until out_of_bounds?(position)
-
-        unless board[position].nil?
-          all_possible_moves << position.dup if board[position].color != @color
-          next
-        else
-          all_possible_moves << position.dup
-          position[0] += x_dir
-          position[1] += y_dir
-        end
-      end
-    end
-
-    all_possible_moves
+  def moves(type_of_move)
+    super(MOVES[type_of_move])
   end
-
 
 end
 
@@ -96,23 +110,8 @@ class SteppingPiece < Piece
     ]
   }
 
-  def move_dirs(board, type_of_move)
-    all_moves = []
-    MOVES[type_of_move].each do |move|
-      x_dir, y_dir = move[0], move[1]
-      position = [@location[0] + x_dir, @location[1] + y_dir]
-
-      next if out_of_bounds?(position)
-
-      if board[position].nil?
-        all_moves << position.dup
-      else
-        all_moves << position.dup if board[position].color != @color
-      end
-
-    end
-
-    all_moves
+  def moves(type_of_move)
+    super(MOVES[type_of_move])
   end
 
 end
@@ -149,7 +148,7 @@ class Pawn < Piece
     @moved
   end
 
-  def move_dirs(board, type_of_move)
+  def moves(board, type_of_move)
     all_moves = []
 
     MOVES[type_of_move].each do |move|
@@ -172,8 +171,8 @@ end
 
 class Rook < SlidingPiece
 
-  def move_dirs(board)
-    super(board, :horizontal)
+  def moves
+    super(:horizontal)
   end
 
 end
@@ -181,8 +180,8 @@ end
 
 class Bishop < SlidingPiece
 
-  def move_dirs(board)
-    super(board, :diagonal)
+  def moves
+    super(:diagonal)
   end
 
 end
@@ -190,8 +189,8 @@ end
 
 class Queen < SlidingPiece
 
-  def move_dirs(board)
-    super(board, :queen)
+  def moves
+    super(:queen)
   end
 
 end
@@ -199,8 +198,8 @@ end
 
 class Knight < SteppingPiece
 
-  def move_dirs(board)
-    super(board, :knight)
+  def moves
+    super(:knight)
   end
 
 end
@@ -208,8 +207,8 @@ end
 
 class King < SteppingPiece
 
-  def move_dirs(board)
-    super(board, :king)
+  def moves
+    super(:king)
   end
 
 end
