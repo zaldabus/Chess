@@ -7,9 +7,13 @@ class Board
     Array.new(8) { Array.new(8) }
   end
 
-  def initialize(board = self.class.generate_board)
-    @board = board
-    populate_board
+  def initialize(board = nil)
+    if board.nil?
+      @board = self.class.generate_board
+      populate_board
+    else
+      @board = board
+    end
   end
 
   def populate_board
@@ -62,10 +66,15 @@ class Board
     false
   end
 
-
-
-
-
+  def move(start_position, end_position)
+    #remember to put a rescue retry on
+    #whatever calls this, should be in game class
+    if self[start_position].moves.include?(end_position)
+      self[end_position] = self[start_position]
+      self[end_position].location = end_position
+      self[start_position] = nil
+    end
+  end
 
   def render
     @board.each {|row| p row}
@@ -81,5 +90,8 @@ class Board
     @board[7 - y][x] = value
   end
 
+  def dup
+    Board.new(@board.dup.map {|row| row.dup})
+  end
 
 end

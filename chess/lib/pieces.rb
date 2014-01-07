@@ -1,7 +1,8 @@
 require 'debugger'
 
 class Piece
-  attr_reader :color, :location
+  attr_reader :color
+  attr_accessor :location
 
   def initialize(board, location, color)
     @board, @location, @color = board, location, color
@@ -52,6 +53,12 @@ class Piece
     else
       @all_possible_moves << position.dup if @board[position].color != @color
     end
+  end
+
+  def move_into_check?(pos)
+    # deep dup board
+    # perform moved on duped board
+    # if duped board is now in check, return true
   end
 
 end
@@ -141,8 +148,8 @@ class Pawn < Piece
     ]
    }
 
-  def initialize(board, loc, color)
-    super(board, loc, color)
+  def initialize(board, location, color)
+    super(board, location, color)
     @moved = false
   end
 
