@@ -7,12 +7,12 @@ class Board
 
   def [](pos)
     x, y = pos[0], pos[1]
-    @board[x][y]
+    @board[7 - y][x]
   end
 
   def []=(pos, value)
     x, y = pos[0], pos[1]
-    @board[x][y] = value
+    @board[7 - y][x] = value
   end
 
   def out_of_bounds?(pos)
