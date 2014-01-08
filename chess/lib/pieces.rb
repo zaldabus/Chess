@@ -30,17 +30,7 @@ class Piece
   end
 
   def all_valid_moves(move_deltas)
-    @all_possible_moves = []
-
-    move_deltas.each do |position|
-      x_dir, y_dir = position[0], position[1]
-      position = [@location[0] + x_dir, @location[1] + y_dir]
-
-      sliding_moves(position, x_dir, y_dir) if self.is_a?(SlidingPiece)
-      stepping_moves(position) if self.is_a?(SteppingPiece)
-
-    end
-    @all_possible_moves.reject {|move| move_into_check?(move)}
+    self.all_moves.reject {|move| move_into_check?(move)}
   end
 
   def all_moves(move_deltas)
@@ -60,10 +50,7 @@ class Piece
   def move_into_check?(pos)
     copy_board = @board.dup
     copy_board.move(@location, pos)
-
-    bool = copy_board.in_check?(@color) ? true : false
-
-    bool
+    copy_board.in_check?(@color) ? true : false
   end
 
   def dup(new_board)
