@@ -35,23 +35,28 @@ class Board
       when 2, 5
         self[[i, row]] = Bishop.new(self, [i, row], color)
       when 3
-        if color == :white
-          self[[i, row]] = Queen.new(self, [i, row], color)
-        else
-          self[[i, row]] = King.new(self, [i, row], color)
-        end
+        self[[i, row]] = Queen.new(self, [i, row], color)
       when 4
-        if color == :white
-          self[[i, row]] = King.new(self, [i, row], color)
-        else
-          self[[i, row]] = Queen.new(self, [i, row], color)
-        end
+        self[[i, row]] = King.new(self, [i, row], color)
       end
     end
   end
 
   def make_pawn_row(row, color)
      (0..7).each {|i| self[[i, row]] = Pawn.new(self, [i, row], color)}
+  end
+
+  def checkmate?(color)
+    debugger
+    if in_check?(color)
+      @board.flatten.each do |piece|
+        next if piece.nil? || piece.color != color
+        return false unless piece.all_valid_moves.empty?
+      end
+      true
+    else
+      false
+    end
   end
 
   def in_check?(color)
@@ -68,6 +73,7 @@ class Board
     false
   end
 
+  #Remember this needs to be exceptionized for invaled moves
   def move(start_position, end_position)
       self[start_position].location = end_position
       self[end_position] = self[start_position]
@@ -75,7 +81,7 @@ class Board
   end
 
   def render
-    @board.each {|row| p row}
+    @board.each { |row| p row }
   end
 
   def [](pos)

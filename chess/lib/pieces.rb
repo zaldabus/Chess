@@ -14,11 +14,21 @@ class Piece
   end
 
   def to_s
-    "#{self.color[0]}#{self.class}"
+    "#{self.color[0]} #{self.class.to_s[0]}"
   end
 
   def all_valid_moves(move_deltas)
-    all_moves(move_deltas).reject {|move| move_into_check?(move)}
+    @all_possible_moves = []
+
+    move_deltas.each do |position|
+      x_dir, y_dir = position[0], position[1]
+      position = [@location[0] + x_dir, @location[1] + y_dir]
+
+      sliding_moves(position, x_dir, y_dir) if self.is_a?(SlidingPiece)
+      stepping_moves(position) if self.is_a?(SteppingPiece)
+
+    end
+    @all_possible_moves.reject {|move| move_into_check?(move)}
   end
 
   def all_moves(move_deltas)
@@ -182,7 +192,7 @@ class Pawn < Piece
   end
 
   def all_valid_moves
-    all_moves
+    all_moves.reject {|move| move_into_check?(move)}
   end
 
   def all_moves
@@ -210,7 +220,7 @@ end
 
 class Rook < SlidingPiece
 
-  def all_valid_amoves
+  def all_valid_moves
     super(:horizontal)
   end
 
