@@ -19,32 +19,14 @@ class Board
     end
   end
 
-  def populate_board
-    make_complex_row(7, :white)
-    make_pawn_row(6, :white)
-    make_complex_row(0, :black)
-    make_pawn_row(1, :black)
+  def [](pos)
+    x, y = pos[0], pos[1]
+    @board[y][x]
   end
 
-  def make_complex_row(row, color)
-    (0..7).each do |i|
-      case i
-      when 0, 7
-        self[[i, row]] = Rook.new(self, [i, row], color)
-      when 1, 6
-        self[[i, row]] = Knight.new(self, [i, row], color)
-      when 2, 5
-        self[[i, row]] = Bishop.new(self, [i, row], color)
-      when 3
-        self[[i, row]] = Queen.new(self, [i, row], color)
-      when 4
-        self[[i, row]] = King.new(self, [i, row], color)
-      end
-    end
-  end
-
-  def make_pawn_row(row, color)
-     (0..7).each {|i| self[[i, row]] = Pawn.new(self, [i, row], color)}
+  def []=(pos, value)
+    x, y = pos[0], pos[1]
+    @board[y][x] = value
   end
 
   def checkmate?(color)
@@ -73,7 +55,6 @@ class Board
     false
   end
 
-  #Remember this needs to be exceptionized for invaled moves
   def move(start_position, end_position)
       self[start_position].location = end_position
       self[end_position] = self[start_position]
@@ -96,16 +77,6 @@ class Board
 
   end
 
-  def [](pos)
-    x, y = pos[0], pos[1]
-    @board[y][x]
-  end
-
-  def []=(pos, value)
-    x, y = pos[0], pos[1]
-    @board[y][x] = value
-  end
-
   def dup
     new_board = Board.new
     self.board.each_with_index do |row, i|
@@ -121,15 +92,33 @@ class Board
     new_board
   end
 
-end
+  private
+  def populate_board
+    make_complex_row(7, :white)
+    make_pawn_row(6, :white)
+    make_complex_row(0, :black)
+    make_pawn_row(1, :black)
+  end
 
-=begin
-load 'pieces.rb'
-load 'board.rb'
-b = Board.new
-b.move([5,6], [5,5])
-b.move([4,1], [4,3])
-b.move([6,6], [6,4])
-b.move([3,0], [7,4])
-b.checkmate?(:white)
-=end
+  def make_complex_row(row, color)
+    (0..7).each do |i|
+      case i
+      when 0, 7
+        self[[i, row]] = Rook.new(self, [i, row], color)
+      when 1, 6
+        self[[i, row]] = Knight.new(self, [i, row], color)
+      when 2, 5
+        self[[i, row]] = Bishop.new(self, [i, row], color)
+      when 3
+        self[[i, row]] = Queen.new(self, [i, row], color)
+      when 4
+        self[[i, row]] = King.new(self, [i, row], color)
+      end
+    end
+  end
+
+  def make_pawn_row(row, color)
+     (0..7).each {|i| self[[i, row]] = Pawn.new(self, [i, row], color)}
+  end
+
+end

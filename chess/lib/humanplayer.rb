@@ -1,4 +1,3 @@
-# encoding: UTF-8
 class HumanPlayer
 
   attr_reader :name

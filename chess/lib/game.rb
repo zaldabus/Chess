@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require_relative 'board'
 require_relative 'humanplayer'
 
@@ -33,6 +32,7 @@ class Game
     puts "Checkmate! #{@players[@turn].name} won!"
   end
 
+  private
   def over?
     @game_board.checkmate?(:white) || @game_board.checkmate?(:black)
   end
