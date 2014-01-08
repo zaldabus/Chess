@@ -14,22 +14,11 @@ class Piece
   end
 
   def to_s
-    self.class
+    "#{self.color[0]}#{self.class}"
   end
 
-  def moves(move_deltas)
-    @all_possible_moves = []
-
-    move_deltas.each do |position|
-      x_dir, y_dir = position[0], position[1]
-      position = [@location[0] + x_dir, @location[1] + y_dir]
-
-      sliding_moves(position, x_dir, y_dir) if self.is_a?(SlidingPiece)
-      stepping_moves(position) if self.is_a?(SteppingPiece)
-
-    end
-    # debugger
-    @all_possible_moves.reject {|move| move_into_check?(move)}
+  def all_valid_moves(move_deltas)
+    all_moves(move_deltas).reject {|move| move_into_check?(move)}
   end
 
   def all_moves(move_deltas)
@@ -43,7 +32,6 @@ class Piece
       stepping_moves(position) if self.is_a?(SteppingPiece)
 
     end
-    # debugger
     @all_possible_moves
   end
 
@@ -73,13 +61,11 @@ class Piece
   end
 
   def move_into_check?(pos)
-    #this isn't working correctly, check code on Wednesday
-    # debugger
     copy_board = @board.dup
     copy_board.move(@location, pos)
 
     bool = copy_board.in_check?(@color) ? true : false
-    # p bool
+
     bool
   end
 
@@ -117,7 +103,7 @@ class SlidingPiece < Piece
     ]
   }
 
-  def moves(type_of_move)
+  def all_valid_moves(type_of_move)
     super(MOVES[type_of_move])
   end
 
@@ -153,7 +139,7 @@ class SteppingPiece < Piece
     ]
   }
 
-  def moves(type_of_move)
+  def all_valid_moves(type_of_move)
     super(MOVES[type_of_move])
   end
 
@@ -195,11 +181,12 @@ class Pawn < Piece
     @moved
   end
 
-  def all_moves()
-    #skips over piece if still hasn't moved
-    #diagonals need work
+  def all_valid_moves
+    all_moves
+  end
+
+  def all_moves
     @all_possible_moves = []
-    # debugger
     MOVES[@color].each do |move|
       x_dir, y_dir = move[0], move[1]
       position = [@location[0] + x_dir, @location[1] + y_dir]
@@ -213,8 +200,6 @@ class Pawn < Piece
       elsif x_dir.abs == 0 && @board[position].nil?
         @all_possible_moves << position.dup
       end
-
-
     end
 
     @all_possible_moves
@@ -225,7 +210,7 @@ end
 
 class Rook < SlidingPiece
 
-  def moves
+  def all_valid_amoves
     super(:horizontal)
   end
 
@@ -238,7 +223,7 @@ end
 
 class Bishop < SlidingPiece
 
-  def moves
+  def all_valid_moves
     super(:diagonal)
   end
 
@@ -251,7 +236,7 @@ end
 
 class Queen < SlidingPiece
 
-  def moves
+  def all_valid_moves
     super(:queen)
   end
 
@@ -264,7 +249,7 @@ end
 
 class Knight < SteppingPiece
 
-  def moves
+  def all_valid_moves
     super(:knight)
   end
 
@@ -277,7 +262,7 @@ end
 
 class King < SteppingPiece
 
-  def moves
+  def all_valid_moves
     super(:king)
   end
 

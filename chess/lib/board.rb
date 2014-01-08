@@ -61,13 +61,9 @@ class Board
       .last
       .location
 
-      p location
     @board.flatten.each do |piece|
       next if piece.nil?
-      if piece.all_moves.include?(location)
-
-        return true
-      end
+      return true if piece.all_moves.include?(location)
     end
     false
   end
@@ -93,21 +89,6 @@ class Board
   end
 
   def dup
-
-    # new_board = Board.new(@board.dup.map do |row|
-#       row.dup.map do |col|
-#         col
-#       end
-#     end)
-#
-#     new_board.board.map! do |row|
-#       row.map! do |col|
-#         next if col.nil?
-#         col.dup(new_board)
-#       end
-#     end
-#     new_board
-
     new_board = Board.new
     self.board.each_with_index do |row, i|
       row.each_with_index do |space, j|
