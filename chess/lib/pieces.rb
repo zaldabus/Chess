@@ -1,7 +1,7 @@
 require 'debugger'
 
 class Piece
-  attr_reader :color
+  attr_reader :color, :all_possible_moves, :board
   attr_accessor :location
 
   def initialize(board, location, color)
@@ -28,9 +28,26 @@ class Piece
       stepping_moves(position) if self.is_a?(SteppingPiece)
 
     end
+    # debugger
+    @all_possible_moves.reject {|move| move_into_check?(move)}
+  end
 
+  def all_moves(move_deltas)
+    @all_possible_moves = []
+
+    move_deltas.each do |position|
+      x_dir, y_dir = position[0], position[1]
+      position = [@location[0] + x_dir, @location[1] + y_dir]
+
+      sliding_moves(position, x_dir, y_dir) if self.is_a?(SlidingPiece)
+      stepping_moves(position) if self.is_a?(SteppingPiece)
+
+    end
+    # debugger
     @all_possible_moves
   end
+
+
 
   def sliding_moves(position, x_dir, y_dir)
     until out_of_bounds?(position)
@@ -56,9 +73,18 @@ class Piece
   end
 
   def move_into_check?(pos)
-    # deep dup board
-    # perform moved on duped board
-    # if duped board is now in check, return true
+    #this isn't working correctly, check code on Wednesday
+    # debugger
+    copy_board = @board.dup
+    copy_board.move(@location, pos)
+
+    bool = copy_board.in_check?(@color) ? true : false
+    # p bool
+    bool
+  end
+
+  def dup(new_board)
+    self.class.new(new_board, @location.dup, @color)
   end
 
 end
@@ -95,6 +121,10 @@ class SlidingPiece < Piece
     super(MOVES[type_of_move])
   end
 
+  def all_moves(type_of_move)
+    super(MOVES[type_of_move])
+  end
+
 end
 
 
@@ -127,6 +157,10 @@ class SteppingPiece < Piece
     super(MOVES[type_of_move])
   end
 
+  def all_moves(type_of_move)
+    super(MOVES[type_of_move])
+  end
+
 end
 
 
@@ -134,17 +168,17 @@ class Pawn < Piece
 
   MOVES = {
     white: [
-      [-1, 1],
-      [ 1, 1],
-      [ 0, 1],
-      [ 0, 2]
-    ],
-
-    black: [
       [-1, -1],
       [ 1, -1],
       [ 0, -1],
       [ 0, -2]
+    ],
+
+    black: [
+      [-1, 1],
+      [ 1, 1],
+      [ 0, 1],
+      [ 0, 2]
     ]
    }
 
@@ -161,10 +195,10 @@ class Pawn < Piece
     @moved
   end
 
-  def moves()
+  def all_moves()
     #skips over piece if still hasn't moved
     #diagonals need work
-    all_moves = []
+    @all_possible_moves = []
     # debugger
     MOVES[@color].each do |move|
       x_dir, y_dir = move[0], move[1]
@@ -175,15 +209,15 @@ class Pawn < Piece
       break if !@board[position].nil? && x_dir == 0
 
       if x_dir.abs == 1 && !@board[position].nil?
-        all_moves << position.dup if @board[position].color != @color
+        @all_possible_moves << position.dup if @board[position].color != @color
       elsif x_dir.abs == 0 && @board[position].nil?
-        all_moves << position.dup
+        @all_possible_moves << position.dup
       end
 
 
     end
 
-    all_moves
+    @all_possible_moves
   end
 
 end
@@ -192,6 +226,10 @@ end
 class Rook < SlidingPiece
 
   def moves
+    super(:horizontal)
+  end
+
+  def all_moves
     super(:horizontal)
   end
 
@@ -204,12 +242,20 @@ class Bishop < SlidingPiece
     super(:diagonal)
   end
 
+  def all_moves
+    super(:diagonal)
+  end
+
 end
 
 
 class Queen < SlidingPiece
 
   def moves
+    super(:queen)
+  end
+
+  def all_moves
     super(:queen)
   end
 
@@ -222,12 +268,20 @@ class Knight < SteppingPiece
     super(:knight)
   end
 
+  def all_moves
+    super(:knight)
+  end
+
 end
 
 
 class King < SteppingPiece
 
   def moves
+    super(:king)
+  end
+
+  def all_moves
     super(:king)
   end
 

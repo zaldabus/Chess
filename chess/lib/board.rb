@@ -3,6 +3,8 @@ require 'debugger'
 
 class Board
 
+  attr_reader :board
+
   def self.generate_board
     Array.new(8) { Array.new(8) }
   end
@@ -17,10 +19,10 @@ class Board
   end
 
   def populate_board
-    make_complex_row(0, :white)
-    make_pawn_row(1, :white)
-    make_complex_row(7, :black)
-    make_pawn_row(6, :black)
+    make_complex_row(7, :white)
+    make_pawn_row(6, :white)
+    make_complex_row(0, :black)
+    make_pawn_row(1, :black)
   end
 
   def make_complex_row(row, color)
@@ -59,21 +61,21 @@ class Board
       .last
       .location
 
+      p location
     @board.flatten.each do |piece|
       next if piece.nil?
-      return true if piece.moves.include?(location)
+      if piece.all_moves.include?(location)
+
+        return true
+      end
     end
     false
   end
 
   def move(start_position, end_position)
-    #remember to put a rescue retry on
-    #whatever calls this, should be in game class
-    if self[start_position].moves.include?(end_position)
+      self[start_position].location = end_position
       self[end_position] = self[start_position]
-      self[end_position].location = end_position
       self[start_position] = nil
-    end
   end
 
   def render
@@ -82,16 +84,42 @@ class Board
 
   def [](pos)
     x, y = pos[0], pos[1]
-    @board[7 - y][x]
+    @board[y][x]
   end
 
   def []=(pos, value)
     x, y = pos[0], pos[1]
-    @board[7 - y][x] = value
+    @board[y][x] = value
   end
 
   def dup
-    Board.new(@board.dup.map {|row| row.dup})
+
+    # new_board = Board.new(@board.dup.map do |row|
+#       row.dup.map do |col|
+#         col
+#       end
+#     end)
+#
+#     new_board.board.map! do |row|
+#       row.map! do |col|
+#         next if col.nil?
+#         col.dup(new_board)
+#       end
+#     end
+#     new_board
+
+    new_board = Board.new
+    self.board.each_with_index do |row, i|
+      row.each_with_index do |space, j|
+        if space
+          new_board[[j, i]] = space.dup(new_board)
+        else
+          new_board[[j, i]] = space
+        end
+      end
+    end
+
+    new_board
   end
 
 end
