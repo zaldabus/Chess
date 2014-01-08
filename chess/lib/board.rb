@@ -47,7 +47,6 @@ class Board
   end
 
   def checkmate?(color)
-    debugger
     if in_check?(color)
       @board.flatten.each do |piece|
         next if piece.nil? || piece.color != color
@@ -110,3 +109,14 @@ class Board
   end
 
 end
+
+=begin
+load 'pieces.rb'
+load 'board.rb'
+b = Board.new
+b.move([5,6], [5,5])
+b.move([4,1], [4,3])
+b.move([6,6], [6,4])
+b.move([3,0], [7,4])
+b.checkmate?(:white)
+=end
