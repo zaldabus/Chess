@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class HumanPlayer
 
   attr_reader :name
@@ -7,7 +8,7 @@ class HumanPlayer
   end
 
   def play_turn
-    puts "Please enter your move, #{@name}. (usage: l#, l#)"
+    puts "Please enter your move, #{@name}."
     players_input = gets.chomp
     convert_move_for_chess(players_input)
   end

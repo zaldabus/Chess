@@ -1,5 +1,6 @@
+# encoding: UTF-8
 require_relative 'pieces'
-require 'debugger'
+require 'colorize'
 
 class Board
 
@@ -80,7 +81,19 @@ class Board
   end
 
   def render
-    @board.each { |row| p row }
+    black = :on_light_white
+    white = :on_light_black
+
+    @board.each_with_index do |row, i|
+      color = (i.even? ? white : black)
+      row.each_with_index do |space, j|
+        space = " " if space.nil?
+        print space.to_s.send(color)
+        color = (color == white ? black : white)
+      end
+      puts
+    end
+
   end
 
   def [](pos)

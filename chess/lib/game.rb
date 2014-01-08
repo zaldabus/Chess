@@ -1,6 +1,7 @@
+# encoding: UTF-8
 require_relative 'board'
 require_relative 'humanplayer'
-require 'debugger'
+
 
 class Game
   def initialize(player1, player2)

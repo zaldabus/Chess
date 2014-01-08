@@ -1,6 +1,23 @@
-require 'debugger'
+# encoding: UTF-8
+require 'colorize'
 
 class Piece
+
+  PIECES = {
+    ["King",   :white] => "♔",
+    ["Queen",  :white] => "♕",
+    ["Rook",   :white] => "♖",
+    ["Bishop", :white] => "♗",
+    ["Knight", :white] => "♘",
+    ["Pawn",   :white] => "♙",
+    ["King",   :black] => "♚",
+    ["Queen",  :black] => "♛",
+    ["Rook",   :black] => "♜",
+    ["Bishop", :black] => "♝",
+    ["Knight", :black] => "♞",
+    ["Pawn",   :black] => "♟"
+  }
+
   attr_reader :color, :all_possible_moves, :board
   attr_accessor :location
 
@@ -14,7 +31,7 @@ class Piece
   end
 
   def to_s
-    "#{self.color[0]} #{self.class.to_s[0]}"
+    return PIECES[[self.class.to_s, @color]].bold
   end
 
   def all_valid_moves(move_deltas)
