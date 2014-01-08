@@ -25,11 +25,6 @@ class Piece
     @board, @location, @color = board, location, color
   end
 
-  def out_of_bounds?(pos)
-    x, y = pos[0], pos[1]
-    x < 0 || y < 0 || x >= 8 || y >= 8
-  end
-
   def to_s
     return PIECES[[self.class.to_s, @color]].bold
   end
@@ -62,7 +57,33 @@ class Piece
     @all_possible_moves
   end
 
+  def move_into_check?(pos)
+    copy_board = @board.dup
+    copy_board.move(@location, pos)
 
+    bool = copy_board.in_check?(@color) ? true : false
+
+    bool
+  end
+
+  def dup(new_board)
+    self.class.new(new_board, @location.dup, @color)
+  end
+
+  private
+  def out_of_bounds?(pos)
+    x, y = pos[0], pos[1]
+    x < 0 || y < 0 || x >= 8 || y >= 8
+  end
+
+  def stepping_moves(position)
+    return if out_of_bounds?(position)
+    if @board[position].nil?
+      @all_possible_moves << position.dup
+    else
+      @all_possible_moves << position.dup if @board[position].color != @color
+    end
+  end
 
   def sliding_moves(position, x_dir, y_dir)
     until out_of_bounds?(position)
@@ -76,28 +97,6 @@ class Piece
         position[1] += y_dir
       end
     end
-  end
-
-  def stepping_moves(position)
-    return if out_of_bounds?(position)
-    if @board[position].nil?
-      @all_possible_moves << position.dup
-    else
-      @all_possible_moves << position.dup if @board[position].color != @color
-    end
-  end
-
-  def move_into_check?(pos)
-    copy_board = @board.dup
-    copy_board.move(@location, pos)
-
-    bool = copy_board.in_check?(@color) ? true : false
-
-    bool
-  end
-
-  def dup(new_board)
-    self.class.new(new_board, @location.dup, @color)
   end
 
 end

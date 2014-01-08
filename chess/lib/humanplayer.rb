@@ -13,6 +13,7 @@ class HumanPlayer
     convert_move_for_chess(players_input)
   end
 
+  private
   def convert_move_for_chess(players_input)
     @horizontal_directional = ("a".."h").to_a
 
